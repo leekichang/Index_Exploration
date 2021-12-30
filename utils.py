@@ -31,6 +31,8 @@ class ExpoAverageMeter(object):
         self.avg = self.beta * self.avg + (1 - self.beta) * self.val
 
 
+
+
 def save_checkpoint(epoch, model, optimizer, val_loss, is_best):
     ensure_folder(save_folder)
     state = {'model': model,

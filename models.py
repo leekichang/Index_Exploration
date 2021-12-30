@@ -1,3 +1,4 @@
+import torch.nn
 import torch.nn as nn
 from torchsummary import summary
 
@@ -170,6 +171,34 @@ class SegNet(nn.Module):
                 l2.weight.data = l1.weight.data
                 l2.bias.data = l1.bias.data
 
+
+class Vgg16(nn.Module):
+    def __init__(self, n_classes=3, in_channels=3, is_unpooling=True):
+        super(SegNet, self).__init__()
+
+        self.in_channels = in_channels
+        self.is_unpooling = is_unpooling
+
+        self.down1 = segnetDown2(self.in_channels, 64)
+        self.down2 = segnetDown2(64, 128)
+        self.down3 = segnetDown3(128, 256)
+        self.down4 = segnetDown3(256, 512)
+        self.down5 = segnetDown3(512, 512)
+
+        self.fc1 = torch.nn.Linear(in_features = 7*7*512, out_features = 4096, bias = True)
+        self.fc2 = torch.nn.Linear(in_features = 4096, out_features = 1000, bias=True)
+        self.fc3 = torch.nn.Linear(in_features = 1000, out_features = n_classes, bias=True)
+
+    def forward(self, inputs):
+        down1, indices_1, unpool_shape1 = self.down1(inputs)
+        down2, indices_2, unpool_shape2 = self.down2(down1)
+        down3, indices_3, unpool_shape3 = self.down3(down2)
+        down4, indices_4, unpool_shape4 = self.down4(down3)
+        down5, indices_5, unpool_shape5 = self.down5(down4)
+        out = self.fc1(down5)
+        out = self.fc2(out)
+        out = self.fc3(out)
+        return out, indices_1, indices_2, indices_3, indices_4, indices_5
 
 if __name__ == '__main__':
     model = SegNet().to(device)
