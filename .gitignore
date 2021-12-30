@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+.idea/
+__pycache__/
+Dataset_CamVid/
+Slide/
+CamVid.zip
+models/
