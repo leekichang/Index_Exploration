@@ -1,6 +1,5 @@
 import torch.nn
 import torch.nn as nn
-from torchsummary import summary
 
 from config import device, imsize
 
@@ -174,7 +173,7 @@ class SegNet(nn.Module):
 
 class Vgg16(nn.Module):
     def __init__(self, n_classes=3, in_channels=3, is_unpooling=True):
-        super(SegNet, self).__init__()
+        super(Vgg16, self).__init__()
 
         self.in_channels = in_channels
         self.is_unpooling = is_unpooling
@@ -187,7 +186,7 @@ class Vgg16(nn.Module):
 
         self.fc1 = torch.nn.Linear(in_features = 7*7*512, out_features = 4096, bias = True)
         self.fc2 = torch.nn.Linear(in_features = 4096, out_features = 1000, bias=True)
-        self.fc3 = torch.nn.Linear(in_features = 1000, out_features = n_classes, bias=True)
+        self.fc3 = torch.nn.Linear(in_features = 1000, out_features = n_classes, bias=False)
 
     def forward(self, inputs):
         down1, indices_1, unpool_shape1 = self.down1(inputs)
@@ -195,7 +194,8 @@ class Vgg16(nn.Module):
         down3, indices_3, unpool_shape3 = self.down3(down2)
         down4, indices_4, unpool_shape4 = self.down4(down3)
         down5, indices_5, unpool_shape5 = self.down5(down4)
-        out = self.fc1(down5)
+        out = down5.view(down5.size(0), -1)
+        out = self.fc1(out)
         out = self.fc2(out)
         out = self.fc3(out)
         return out, indices_1, indices_2, indices_3, indices_4, indices_5
@@ -203,4 +203,3 @@ class Vgg16(nn.Module):
 if __name__ == '__main__':
     model = SegNet().to(device)
 
-    summary(model, (3, imsize, imsize))

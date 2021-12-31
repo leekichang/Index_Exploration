@@ -17,25 +17,24 @@ checkpoint = './models/BEST_checkpoint.tar'  # model checkpoint
 print('checkpoint: ' + str(checkpoint))
 
 # Load models
-checkpoint = torch.load(checkpoint)
+checkpoint = torch.load(checkpoint, map_location=torch.device('cpu'))
 model = checkpoint['model']
 model = model.to(device)
 model.eval()
 
 test_path = './images/input'
-test_images = [os.path.join(test_path, f) for f in os.listdir(test_path) if f.endswith('.png')]
 ensure_folder('./images/input')
+test_images = [os.path.join(test_path, f) for f in os.listdir(test_path) if f.endswith('.png')].sort()
 num_test_samples = len(test_images)
 
 imgs = torch.zeros([num_test_samples, 3, imsize, imsize], dtype=torch.float, device=device)
-#print(len(test_images))
 
 for i, path in enumerate(test_images):
     # Read images
     img = cv.imread(path)
     img = cv.resize(img, (imsize, imsize))
     img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-    imsave('images/input/{}_image.png'.format(i), img)
+    # imsave('images/input/{}_image.png'.format(i), img)
 
     img = img.transpose(2, 0, 1)
     # img = cv.imread(path)
