@@ -8,13 +8,11 @@ from data_gen import VaeDataset
 from models import SegNet
 from utils import *
 
+from MyModels import MYSegNet
 
 def train(epoch, train_loader, model, optimizer):
     # Ensure dropout layers are in train mode
     model.train()
-
-    # Loss function
-    # criterion = nn.MSELoss().to(device)
 
     batch_time = ExpoAverageMeter()  # forward prop. + back prop. time
     losses = ExpoAverageMeter()  # loss (per word decoded)
@@ -27,29 +25,15 @@ def train(epoch, train_loader, model, optimizer):
         x = x.to(device)
         y = y.to(device)
 
-        # print('x.size(): ' + str(x.size())) # [32, 3, 224, 224]
-        # print('y.size(): ' + str(y.size())) # [32, 3, 224, 224]
-
         # Zero gradients
         optimizer.zero_grad()
 
         y_hat = model(x)
-        # print('y_hat.size(): ' + str(y_hat.size())) # [32, 3, 224, 224]
 
         loss = torch.sqrt((y_hat - y).pow(2).mean())
         loss.backward()
 
-        # def closure():
-        #     optimizer.zero_grad()
-        #     y_hat = model(x)
-        #     loss = torch.sqrt((y_hat - y).pow(2).mean())
-        #     loss.backward()
-        #     losses.update(loss.item())
-        #     return loss
-
-        # optimizer.step(closure)
         optimizer.step()
-
         # Keep track of metrics
         losses.update(loss.item())
         batch_time.update(time.time() - start)
@@ -67,9 +51,6 @@ def train(epoch, train_loader, model, optimizer):
 
 def valid(val_loader, model):
     model.eval()  # eval mode (no dropout or batchnorm)
-
-    # Loss function
-    # criterion = nn.MSELoss().to(device)
 
     batch_time = ExpoAverageMeter()  # forward prop. + back prop. time
     losses = ExpoAverageMeter()  # loss (per word decoded)
@@ -99,7 +80,6 @@ def valid(val_loader, model):
                       'Loss {loss.val:.7f} ({loss.avg:.7f})\t'.format(i_batch, len(val_loader),
                                                                       batch_time=batch_time,
                                                                       loss=losses))
-
     return losses.avg
 
 
@@ -110,7 +90,7 @@ def main():
                             pin_memory=True, drop_last=True)
     # Create SegNet model
     label_nbr = 3
-    model = SegNet(label_nbr)
+    model = MYSegNet(label_nbr)
     if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")
         # dim = 0 [40, xxx] -> [10, ...], [10, ...], [10, ...], [10, ...] on 4 GPUs

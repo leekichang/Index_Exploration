@@ -52,8 +52,8 @@ from sklearn.model_selection import train_test_split
 
 
 def load_dataset(DATASET_DIR='./data/', image_height=224, BATCH_SIZE=256):
-    train_dir = DATASET_DIR + 'train10/'
-    test_dir = DATASET_DIR + 'test10/'
+    train_dir = DATASET_DIR + 'train/'
+    test_dir = DATASET_DIR + 'test/'
     train_transforms = transforms.Compose([transforms.RandomRotation(10),
                                            transforms.RandomHorizontalFlip(),
                                            transforms.RandomResizedCrop(image_height),

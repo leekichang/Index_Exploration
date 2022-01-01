@@ -1,6 +1,6 @@
 import torch.nn
 import torch.nn as nn
-
+import torchvision.models
 from config import device, imsize
 
 
@@ -200,6 +200,56 @@ class Vgg16(nn.Module):
         out = self.fc3(out)
         return out, indices_1, indices_2, indices_3, indices_4, indices_5
 
+class SegNet_Decoder(nn.Module):
+    def __init__(self, n_classes=3, in_channels=3, is_unpooling=True):
+        super(SegNet_Decoder, self).__init__()
+        self.up5 = segnetUp3(512, 512)
+        self.up4 = segnetUp3(512, 256)
+        self.up3 = segnetUp3(256, 128)
+        self.up2 = segnetUp2(128, 64)
+        self.up1 = segnetUp2(64, n_classes)
+
+    def forward(self, down5, indices_5, unpool_shape5, indices_4, unpool_shape4, indices_3, unpool_shape3, indices_2, unpool_shape2, indices_1, unpool_shape1):
+        up5 = self.up5(down5, indices_5, unpool_shape5)
+        up4 = self.up4(up5, indices_4, unpool_shape4)
+        up3 = self.up3(up4, indices_3, unpool_shape3)
+        up2 = self.up2(up3, indices_2, unpool_shape2)
+        up1 = self.up1(up2, indices_1, unpool_shape1)
+        return up1
+
+class Vgg16FeatureExtractor:
+    def __init__(self):
+        Vgg16 = torchvision.models.vgg16(pretrained=True)
+        max_pool = [4, 9, 16, 23, 30]
+        for param in Vgg16.features.parameters():
+            param.requires_grad = False
+        for i in max_pool:
+            Vgg16.features[i].return_indices = True
+        self.feature_1 = Vgg16.features[0:5]
+        self.feature_2 = Vgg16.features[5:10]
+        self.feature_3 = Vgg16.features[10:17]
+        self.feature_4 = Vgg16.features[17:24]
+        self.feature_5 = Vgg16.features[24:31]
+
+    def forward(self, imgs):
+        out, indices_1 = self.feature_1(imgs)
+        out, indices_2 = self.feature_2(out)
+        out, indices_3 = self.feature_3(out)
+        out, indices_4 = self.feature_4(out)
+        out, indices_5 = self.feature_5(out)
+        return out
+
+class VggClassifier:
+    def __init__(self, n_class):
+        Vgg16 = torchvision.models.vgg16(pretrained=True)
+        Vgg16.classifier[6] = nn.Linear(in_features=4096, out_features=n_class, bias=True)
+        self.avgpool = Vgg16.avgpool
+        self.classifier = Vgg16.classifier
+
+    def forward(self, input):
+        out = self.avgpool(input)
+        out = self.classifier(out)
+        return out
+
 if __name__ == '__main__':
     model = SegNet().to(device)
-
