@@ -43,8 +43,8 @@ def train(epoch, train_loader, model, optimizer):
         # Print status
         if i_batch % print_freq == 0:
             print('Epoch: [{0}][{1}/{2}]\t'
-                  'Batcåh Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                  'Loss {loss.val:.7f} ({loss.avg:.7f})\t'.format(epoch, i_batch, len(train_loader),
+                  'Batch Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                  'Loss {loss.val:.7f} ({loss.avg:.7f})\t'.format(epoch+1, i_batch, len(train_loader),
                                                                   batch_time=batch_time,
                                                                   loss=losses))
 
@@ -91,12 +91,18 @@ def main():
     # Create SegNet model
     label_nbr = 3
     model = MYSegNet(label_nbr)
+
     if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")
         # dim = 0 [40, xxx] -> [10, ...], [10, ...], [10, ...], [10, ...] on 4 GPUs
         model = nn.DataParallel(model)
+    elif torch.cuda.device_count() == 1:
+        print("Let's use", torch.cuda.device_count(), "GPU!")
+    else:
+        print("With CPUS")
     # Use appropriate device
     model = model.to(device)
+
     # print(model)
 
     # define the optimizer

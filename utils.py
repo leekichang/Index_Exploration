@@ -37,11 +37,11 @@ def save_checkpoint(epoch, model, optimizer, val_loss, is_best):
     ensure_folder(save_folder)
     state = {'model': model,
              'optimizer': optimizer}
-    filename = '{0}/checkpoint_{1}_{2:.3f}.tar'.format(save_folder, epoch, val_loss)
+    filename = '{0}/vggcheckpoint_{1}_{2:.3f}.tar'.format(save_folder, epoch, val_loss)
     torch.save(state, filename)
     # If this checkpoint is the best so far, store a copy so it doesn't get overwritten by a worse checkpoint
     if is_best:
-        torch.save(state, '{}/BEST_checkpoint.tar'.format(save_folder))
+        torch.save(state, '{}/BEST_vggcheckpoint.tar'.format(save_folder))
 
 
 import torch

@@ -12,7 +12,7 @@ for param in Vgg16.features.parameters():
 for i in max_pool:
     Vgg16.features[i].return_indices = True
 
-class MySegDown1:
+class MySegDown1(nn.Module):
     def __init__(self):
         super(MySegDown1, self).__init__()
         self.convs = Vgg16.features[0:4]
@@ -25,7 +25,7 @@ class MySegDown1:
         return output, indices, unpooled_shape
 
 
-class MySegDown2:
+class MySegDown2(nn.Module):
     def __init__(self):
         super(MySegDown2, self).__init__()
         self.convs = Vgg16.features[5:9]
@@ -38,7 +38,7 @@ class MySegDown2:
         return output, indices, unpooled_shape
 
 
-class MySegDown3:
+class MySegDown3(nn.Module):
     def __init__(self):
         super(MySegDown3, self).__init__()
         self.convs = Vgg16.features[10:16]
@@ -51,7 +51,7 @@ class MySegDown3:
         return output, indices, unpooled_shape
 
 
-class MySegDown4:
+class MySegDown4(nn.Module):
     def __init__(self):
         super(MySegDown4, self).__init__()
         self.convs = Vgg16.features[17:23]
@@ -64,9 +64,9 @@ class MySegDown4:
         return output, indices, unpooled_shape
 
 
-class MySegDown5:
+class MySegDown5(nn.Module):
     def __init__(self):
-        super(MySegDown1, self).__init__()
+        super(MySegDown5, self).__init__()
         self.convs = Vgg16.features[24:30]
         self.max_pool = Vgg16.features[30]
 
@@ -88,7 +88,6 @@ class MYSegNet(nn.Module):
         self.down3 = MySegDown3()
         self.down4 = MySegDown4()
         self.down5 = MySegDown5()
-
         self.up5 = segnetUp3(512, 512)
         self.up4 = segnetUp3(512, 256)
         self.up3 = segnetUp3(256, 128)
@@ -96,12 +95,11 @@ class MYSegNet(nn.Module):
         self.up1 = segnetUp2(64, n_classes)
 
     def forward(self, inputs):
-
-        down1, indices_1, unpool_shape1 = self.down1(inputs)
-        down2, indices_2, unpool_shape2 = self.down2(down1)
-        down3, indices_3, unpool_shape3 = self.down3(down2)
-        down4, indices_4, unpool_shape4 = self.down4(down3)
-        down5, indices_5, unpool_shape5 = self.down5(down4)
+        down1, indices_1, unpool_shape1 = self.down1.forward(inputs)
+        down2, indices_2, unpool_shape2 = self.down2.forward(down1)
+        down3, indices_3, unpool_shape3 = self.down3.forward(down2)
+        down4, indices_4, unpool_shape4 = self.down4.forward(down3)
+        down5, indices_5, unpool_shape5 = self.down5.forward(down4)
 
         up5 = self.up5(down5, indices_5, unpool_shape5)
         up4 = self.up4(up5, indices_4, unpool_shape4)
