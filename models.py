@@ -39,11 +39,11 @@ class conv2DBatchNormRelu(nn.Module):
 
 
 class segnetDown2(nn.Module):
-    def __init__(self, in_size, out_size):
+    def __init__(self, in_size, out_size, is_unpool=True):
         super(segnetDown2, self).__init__()
         self.conv1 = conv2DBatchNormRelu(in_size, out_size, 3, 1, 1)
         self.conv2 = conv2DBatchNormRelu(out_size, out_size, 3, 1, 1)
-        self.maxpool_with_argmax = nn.MaxPool2d(2, 2, return_indices=True)
+        self.maxpool_with_argmax = nn.MaxPool2d(2, 2, return_indices=is_unpool)
 
     def forward(self, inputs):
         outputs = self.conv1(inputs)
@@ -54,12 +54,12 @@ class segnetDown2(nn.Module):
 
 
 class segnetDown3(nn.Module):
-    def __init__(self, in_size, out_size):
+    def __init__(self, in_size, out_size, is_unpool=True):
         super(segnetDown3, self).__init__()
         self.conv1 = conv2DBatchNormRelu(in_size, out_size, 3, 1, 1)
         self.conv2 = conv2DBatchNormRelu(out_size, out_size, 3, 1, 1)
         self.conv3 = conv2DBatchNormRelu(out_size, out_size, 3, 1, 1)
-        self.maxpool_with_argmax = nn.MaxPool2d(2, 2, return_indices=True)
+        self.maxpool_with_argmax = nn.MaxPool2d(2, 2, return_indices=is_unpool)
 
     def forward(self, inputs):
         outputs = self.conv1(inputs)
@@ -172,17 +172,17 @@ class SegNet(nn.Module):
 
 
 class Vgg16(nn.Module):
-    def __init__(self, n_classes=3, in_channels=3, is_unpooling=True):
+    def __init__(self, n_classes=3, in_channels=3, is_unpooling=False):
         super(Vgg16, self).__init__()
 
         self.in_channels = in_channels
         self.is_unpooling = is_unpooling
 
-        self.down1 = segnetDown2(self.in_channels, 64)
-        self.down2 = segnetDown2(64, 128)
-        self.down3 = segnetDown3(128, 256)
-        self.down4 = segnetDown3(256, 512)
-        self.down5 = segnetDown3(512, 512)
+        self.down1 = segnetDown2(self.in_channels, 64, is_unpooling)
+        self.down2 = segnetDown2(64, 128, is_unpooling)
+        self.down3 = segnetDown3(128, 256, is_unpooling)
+        self.down4 = segnetDown3(256, 512, is_unpooling)
+        self.down5 = segnetDown3(512, 512, is_unpooling)
 
         self.fc1 = torch.nn.Linear(in_features = 7*7*512, out_features = 4096, bias = True)
         self.fc2 = torch.nn.Linear(in_features = 4096, out_features = 1000, bias=True)
