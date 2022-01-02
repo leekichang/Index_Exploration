@@ -1,0 +1,117 @@
+0_image
+SSIM with zero feature
+SSIM:0.62615
+SSIM with random feature
+SSIM:0.76019
+SSIM with vgg feature extractor(not trained)
+SSIM:0.39940
+SSIM with vgg feature extractor(trained)
+SSIM:0.78446
+SSIM with vgg feature extractor and zero feature
+SSIM:0.62615
+SSIM with vgg feature extractor and random feature
+SSIM:0.72298
+1_image
+SSIM with zero feature
+SSIM:0.67867
+SSIM with random feature
+SSIM:0.77185
+SSIM with vgg feature extractor(not trained)
+SSIM:0.38468
+SSIM with vgg feature extractor(trained)
+SSIM:0.81583
+SSIM with vgg feature extractor and zero feature
+SSIM:0.67867
+SSIM with vgg feature extractor and random feature
+SSIM:0.77631
+2_image
+SSIM with zero feature
+SSIM:0.60743
+SSIM with random feature
+SSIM:0.60422
+SSIM with vgg feature extractor(not trained)
+SSIM:0.33702
+SSIM with vgg feature extractor(trained)
+SSIM:0.61753
+SSIM with vgg feature extractor and zero feature
+SSIM:0.60743
+SSIM with vgg feature extractor and random feature
+SSIM:0.62227
+3_image
+SSIM with zero feature
+SSIM:0.66692
+SSIM with random feature
+SSIM:0.71924
+SSIM with vgg feature extractor(not trained)
+SSIM:0.23770
+SSIM with vgg feature extractor(trained)
+SSIM:0.66095
+SSIM with vgg feature extractor and zero feature
+SSIM:0.66692
+SSIM with vgg feature extractor and random feature
+SSIM:0.72571
+4_image
+SSIM with zero feature
+SSIM:0.58022
+SSIM with random feature
+SSIM:0.63846
+SSIM with vgg feature extractor(not trained)
+SSIM:0.38963
+SSIM with vgg feature extractor(trained)
+SSIM:0.71428
+SSIM with vgg feature extractor and zero feature
+SSIM:0.58022
+SSIM with vgg feature extractor and random feature
+SSIM:0.65264
+5_image
+SSIM with zero feature
+SSIM:0.73654
+SSIM with random feature
+SSIM:0.81490
+SSIM with vgg feature extractor(not trained)
+SSIM:0.36005
+SSIM with vgg feature extractor(trained)
+SSIM:0.80710
+SSIM with vgg feature extractor and zero feature
+SSIM:0.73654
+SSIM with vgg feature extractor and random feature
+SSIM:0.80598
+6_image
+SSIM with zero feature
+SSIM:0.71092
+SSIM with random feature
+SSIM:0.77505
+SSIM with vgg feature extractor(not trained)
+SSIM:0.26821
+SSIM with vgg feature extractor(trained)
+SSIM:0.78890
+SSIM with vgg feature extractor and zero feature
+SSIM:0.71092
+SSIM with vgg feature extractor and random feature
+SSIM:0.73806
+7_image
+SSIM with zero feature
+SSIM:0.63507
+SSIM with random feature
+SSIM:0.74237
+SSIM with vgg feature extractor(not trained)
+SSIM:0.27168
+SSIM with vgg feature extractor(trained)
+SSIM:0.73465
+SSIM with vgg feature extractor and zero feature
+SSIM:0.63507
+SSIM with vgg feature extractor and random feature
+SSIM:0.73099
+8_image
+SSIM with zero feature
+SSIM:0.73998
+SSIM with random feature
+SSIM:0.83021
+SSIM with vgg feature extractor(not trained)
+SSIM:0.15980
+SSIM with vgg feature extractor(trained)
+SSIM:0.82832
+SSIM with vgg feature extractor and zero feature
+SSIM:0.73998
+SSIM with vgg feature extractor and random feature
+SSIM:0.84216

@@ -6,25 +6,30 @@ from torch.utils.data import DataLoader
 
 from models import SegNet
 from utils import *
+from parser import *
 
 from imageio import imread, imsave
 
 import numpy as np
 import cv2 as cv
 
-device = 'cpu'
-checkpoint = './models/BEST_checkpoint.tar'  # model checkpoint
+args = parse_args()
+
+device = args.device
+
+checkpoint = args.model #'./models/BEST_checkpoint.tar'  # model checkpoint
 print('checkpoint: ' + str(checkpoint))
 
 # Load models
-checkpoint = torch.load(checkpoint, map_location=torch.device('cpu'))
+checkpoint = torch.load(checkpoint, map_location=torch.device(device))
 model = checkpoint['model']
 model = model.to(device)
 model.eval()
 
 test_path = './images/input'
 ensure_folder('./images/input')
-test_images = [os.path.join(test_path, f) for f in os.listdir(test_path) if f.endswith('.png')].sort()
+test_images = [os.path.join(test_path, f) for f in os.listdir(test_path) if f.endswith('.png')]
+test_images.sort()
 num_test_samples = len(test_images)
 
 imgs = torch.zeros([num_test_samples, 3, imsize, imsize], dtype=torch.float, device=device)
@@ -45,89 +50,124 @@ for i, path in enumerate(test_images):
     img = torch.FloatTensor(img / 255.)
     imgs[i] = img
 
-
-imgs = imgs.clone().detach().requires_grad_(True)
-
-with torch.no_grad():
-    preds = model(imgs)
-
-for i in range(num_test_samples):
-    out = preds[i]
-    out = out.cpu().numpy()
-    out = np.transpose(out, (1, 2, 0))
-    out = out * 255
-    out = np.clip(out, 0, 255)
-    out = out.astype(np.uint8)
-    out = cv.cvtColor(out, cv.COLOR_RGB2BGR)
-    cv.imwrite('images/output/test{}_out.png'.format(i), out)
-
+imgs = imgs.clone().detach().requires_grad_(False)
 
 down1, indices_1, unpool_shape1 = model.down1(imgs)
 down2, indices_2, unpool_shape2 = model.down2(down1)
 down3, indices_3, unpool_shape3 = model.down3(down2)
 down4, indices_4, unpool_shape4 = model.down4(down3)
 down5, indices_5, unpool_shape5 = model.down5(down4)
-
-# down5[5] = down5[5]/2+down5[6]/2
-# down5[6] = down5[5]/2+down5[6]/2
-
-for i in range(num_test_samples):
-    indices_5[i] = indices_5[5]
-    indices_4[i] = indices_4[5]
-    indices_3[i] = indices_3[5]
-    indices_2[i] = indices_2[5]
-    indices_1[i] = indices_1[5]
-
-
+down5 = torch.randn(down5.size())
 up5 = model.up5(down5, indices_5, unpool_shape5)
 up4 = model.up4(up5, indices_4, unpool_shape4)
 up3 = model.up3(up4, indices_3, unpool_shape3)
 up2 = model.up2(up3, indices_2, unpool_shape2)
 up1 = model.up1(up2, indices_1, unpool_shape1)
 
+
+for j in range(9):
+    temp2 = up2[j]
+    temp3 = up3[j]
+    temp4 = up4[j]
+    temp5 = up5[j]
+    for i in range(64):
+        out = temp2[i].detach().cpu().numpy()
+        #out = np.transpose(out, (1, 2, 0))
+        out = out * 255
+        out = np.clip(out, 0, 255)
+        out = out.astype(np.uint8)
+        #out = cv.cvtColor(out, cv.COLOR_RGB2BGR)
+        cv.imwrite(f'images/IndicesMap/{j}_image/rand_up2/up2_0_{i}_out.png', out)
+    for i in range(128):
+        out = temp3[i].detach().cpu().numpy()
+        #out = np.transpose(out, (1, 2, 0))
+        out = out * 255
+        out = np.clip(out, 0, 255)
+        out = out.astype(np.uint8)
+        #out = cv.cvtColor(out, cv.COLOR_RGB2BGR)
+        cv.imwrite(f'images/IndicesMap/{j}_image/rand_up3/up3_0_{i}_out.png', out)
+    for i in range(256):
+        out = temp4[i].detach().cpu().numpy()
+        #out = np.transpose(out, (1, 2, 0))
+        out = out * 255
+        out = np.clip(out, 0, 255)
+        out = out.astype(np.uint8)
+        #out = cv.cvtColor(out, cv.COLOR_RGB2BGR)
+        cv.imwrite(f'images/IndicesMap/{j}_image/rand_up4/up4_0_{i}_out.png', out)
+    for i in range(512):
+        out = temp5[i].detach().cpu().numpy()
+        #out = np.transpose(out, (1, 2, 0))
+        out = out * 255
+        out = np.clip(out, 0, 255)
+        out = out.astype(np.uint8)
+        #out = cv.cvtColor(out, cv.COLOR_RGB2BGR)
+        cv.imwrite(f'images/IndicesMap/{j}_image/rand_up5/up5_0_{i}_out.png', out)
+for j in range(9):
+    for i in range(512):
+        out = down5[j][i].detach().cpu().numpy()
+        #out = np.transpose(out, (1, 2, 0))
+        out = out * 255
+        out = np.clip(out, 0, 255)
+        out = out.astype(np.uint8)
+        #out = cv.cvtColor(out, cv.COLOR_RGB2BGR)
+        cv.imwrite(f'images/IndicesMap/{j}_image/FeatureMap/feature_0_{i}.png', out)
+
+# asd = model.up4(torch.randn((9,512,14,14)), indices_4, unpool_shape4)
+asd = model.up3(torch.randn((9,256,28,28)), indices_3, unpool_shape3)
+asd = model.up2(asd, indices_2, unpool_shape2)
+temp123 = model.up1(asd, indices_1, unpool_shape1)
+
 for i in range(num_test_samples):
-    out_ = up1[i]
+    out_ = temp123[i]
     out_ = out_.cpu().detach().numpy()
     out_ = np.transpose(out_, (1, 2, 0))
     out_ = out_ * 255
     out_ = np.clip(out_, 0, 255)
     out_ = out_.astype(np.uint8)
     out_ = cv.cvtColor(out_, cv.COLOR_RGB2BGR)
-    cv.imwrite(f'images/changed_feature/changed_feature_{i}_out.png', out_)
-#   cv.imwrite(f'images/mixed_feature/mixed_feature_{i}_out.png', out_)
+    cv.imwrite(f'images/{i}_out.png', out_)
 
-# down5 = torch.zeros(num_test_samples, 512, 7, 7)
+# if args.type == 'output':
+#     with torch.no_grad():
+#         preds = model(imgs)
 #
-# up5 = model.up5(down5, indices_5, unpool_shape5)
-# up4 = model.up4(up5, indices_4, unpool_shape4)
-# up3 = model.up3(up4, indices_3, unpool_shape3)
-# up2 = model.up2(up3, indices_2, unpool_shape2)
-# up1 = model.up1(up2, indices_1, unpool_shape1)
+#     for i in range(num_test_samples):
+#         out = preds[i]
+#         out = out.cpu().numpy()
+#         out = np.transpose(out, (1, 2, 0))
+#         out = out * 255
+#         out = np.clip(out, 0, 255)
+#         out = out.astype(np.uint8)
+#         out = cv.cvtColor(out, cv.COLOR_RGB2BGR)
+#         cv.imwrite('images/trained_vgg_output/test{}_out.png'.format(i), out)
+# else:
+#     '''
+#     args.type can be 'rand', 'zero', 'trained_rand', 'trained_zero'
+#     '''
+#     down1, indices_1, unpool_shape1 = model.down1(imgs)
+#     down2, indices_2, unpool_shape2 = model.down2(down1)
+#     down3, indices_3, unpool_shape3 = model.down3(down2)
+#     down4, indices_4, unpool_shape4 = model.down4(down3)
+#     down5, indices_5, unpool_shape5 = model.down5(down4)
+#     if args.type == 'zero' or args.type == 'trained_zero':
+#         down5 = torch.zeros(down5.size())
+#         file_name = 'zero_feature'
+#     elif args.type == 'rand' or args.type == 'trained_rand':
+#         down5 = torch.randn(down5.size())
+#         file_name = 'rand_feature'
+#     up5 = model.up5(down5, indices_5, unpool_shape5)
+#     up4 = model.up4(up5, indices_4, unpool_shape4)
+#     up3 = model.up3(up4, indices_3, unpool_shape3)
+#     up2 = model.up2(up3, indices_2, unpool_shape2)
+#     up1 = model.up1(up2, indices_1, unpool_shape1)
 #
-# for i in range(num_test_samples):
-#     out_ = up1[i]
-#     out_ = out_.cpu().detach().numpy()
-#     out_ = np.transpose(out_, (1, 2, 0))
-#     out_ = out_ * 255
-#     out_ = np.clip(out_, 0, 255)
-#     out_ = out_.astype(np.uint8)
-#     out_ = cv.cvtColor(out_, cv.COLOR_RGB2BGR)
-#     cv.imwrite(f'images/zero_feature/zero_feature_{i}_out.png', out_)
+#     for i in range(num_test_samples):
+#         out_ = up1[i]
+#         out_ = out_.cpu().detach().numpy()
+#         out_ = np.transpose(out_, (1, 2, 0))
+#         out_ = out_ * 255
+#         out_ = np.clip(out_, 0, 255)
+#         out_ = out_.astype(np.uint8)
+#         out_ = cv.cvtColor(out_, cv.COLOR_RGB2BGR)
+#         cv.imwrite(f'images/{args.type}_feature/{file_name}_{i}_out.png', out_)
 #
-# down5 = torch.randn(num_test_samples,512,7,7)
-#
-# up5 = model.up5(down5, indices_5, unpool_shape5)
-# up4 = model.up4(up5, indices_4, unpool_shape4)
-# up3 = model.up3(up4, indices_3, unpool_shape3)
-# up2 = model.up2(up3, indices_2, unpool_shape2)
-# up1 = model.up1(up2, indices_1, unpool_shape1)
-#
-# for i in range(num_test_samples):
-#     out_ = up1[i]
-#     out_ = out_.cpu().detach().numpy()
-#     out_ = np.transpose(out_, (1, 2, 0))
-#     out_ = out_ * 255
-#     out_ = np.clip(out_, 0, 255)
-#     out_ = out_.astype(np.uint8)
-#     out_ = cv.cvtColor(out_, cv.COLOR_RGB2BGR)
-#     cv.imwrite(f'images/rand_feature/rand_feature_{i}_out.png', out_)

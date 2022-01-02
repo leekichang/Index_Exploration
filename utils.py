@@ -96,3 +96,4 @@ def get_metrics(models, pred, anno, num_of_labels=120):
         conf_mat_sum = np.sum(conf_mat, axis=1)
         conf_mat_sum = np.reshape(conf_mat_sum, (num_of_labels, 1))
         sns.heatmap(conf_mat / conf_mat_sum, annot=True, fmt='.2%', cmap='Blues')
+
