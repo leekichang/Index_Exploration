@@ -133,7 +133,7 @@ class SegNet(nn.Module):
         up3 = self.up3(up4, indices_3, unpool_shape3)
         up2 = self.up2(up3, indices_2, unpool_shape2)
         up1 = self.up1(up2, indices_1, unpool_shape1)
-        out = self.Softmax(up1)
+        out = self.softmax(up1)
         return out
 
     def init_vgg16_params(self, vgg16):
