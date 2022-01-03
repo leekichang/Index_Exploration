@@ -36,7 +36,7 @@ trained_vgg_images.sort()
 vgg_zero_images.sort()
 vgg_rand_images.sort()
 
-sys.stdout = open(f'./SSIM_result/results.txt', 'w')
+# sys.stdout = open(f'./SSIM_result/results.txt', 'w')
 for idx, image in enumerate(test_images):
     # print(image, zero_images[idx], rand_images[idx], vgg_images[idx], trained_vgg_images[idx],vgg_zero_images[idx], vgg_rand_images[idx])
     imageA = cv.imread(image)
@@ -61,7 +61,7 @@ for idx, image in enumerate(test_images):
     print(f"SSIM with vgg feature extractor and random feature")
     get_SSIM(imageA, image_vgg_rand)
 
-sys.stdout.close()
+# sys.stdout.close()
 
 
 
