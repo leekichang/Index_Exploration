@@ -5,7 +5,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 from models import SegNet
-from utils import *
+# from utils import *
 from CamVid_utils import *
 from config import *
 
@@ -56,8 +56,13 @@ down5, indices_5, unpool_shape5 = model.down5(down4)
 # out = model.softmax(up1)
 #
 # get_image(out)
-
-down5 = torch.zeros(down5.size(), device=device)
+mean = (down5[0]+down5[1]+down5[2]+down5[3]+down5[4])/5
+# down5 = torch.zeros(down5.size(), device=device)
+down5[0] = mean
+down5[1] = mean
+down5[2] = mean
+down5[3] = mean
+down5[4] = mean
 print(down5.shape)
 up5 = model.up5(down5, indices_5, unpool_shape5)
 up4 = model.up4(up5, indices_4, unpool_shape4)
