@@ -1,6 +1,6 @@
 import os
 
-from config import *
+from utils.config import *
 
 
 def ensure_folder(folder):
@@ -63,6 +63,7 @@ def load_dataset(DATASET_DIR='./data/', image_height=224, BATCH_SIZE=256):
 
     test_transforms = transforms.Compose([transforms.RandomResizedCrop(image_height),
                                           transforms.ToTensor(),
+                                          transforms.Resize(3, 480, 352),
                                           transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                                                std=[0.229, 0.224, 0.225])])
 

@@ -1,6 +1,4 @@
 import torchvision.models
-from models import segnetDown2
-from models import segnetDown3
 from models import segnetUp2
 from models import segnetUp3
 import torch.nn as nn

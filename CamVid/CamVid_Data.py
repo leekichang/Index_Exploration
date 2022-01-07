@@ -36,7 +36,7 @@ def load_data(dataset):
         for j in range(height):
             for k in range(width):
                 y[i, gray_img[j, k], j, k] = 1
-    return x, y
+    return x[:,:,:352,:], y[:,:,:352,:]
 
 class VaeDataset(Dataset):
     def __init__(self, dataset):

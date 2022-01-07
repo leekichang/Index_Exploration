@@ -4,7 +4,7 @@ import cv2 as cv
 import numpy as np
 from torch.utils.data import Dataset
 
-from config import imsize
+from utils.config import imsize
 
 
 def load_data(split):

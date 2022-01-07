@@ -6,9 +6,9 @@ from torch.utils.data import DataLoader
 
 from models import SegNet
 from utils import *
-from parser import *
+# from parser import *
 
-from imageio import imread, imsave
+# from imageio import imread, imsave
 
 import numpy as np
 import cv2 as cv
@@ -28,7 +28,7 @@ model.eval()
 
 test_path = './images/input'
 ensure_folder('./images/input')
-test_images = [os.path.join(test_path, f) for f in os.listdir(test_path) if f.endswith('_adv_out.png')]
+test_images = [os.path.join(test_path, f) for f in os.listdir(test_path) if f.endswith('.png')]
 test_images.sort()
 print(test_images)
 num_test_samples = len(test_images)
@@ -58,6 +58,11 @@ down3, indices_3, unpool_shape3 = model.down3(down2)
 down4, indices_4, unpool_shape4 = model.down4(down3)
 down5, indices_5, unpool_shape5 = model.down5(down4)
 down5 = torch.randn(down5.size())
+indices_1 = torch.flip(indices_1, [3])
+indices_2 = torch.flip(indices_2, [3])
+indices_3 = torch.flip(indices_3, [3])
+indices_4 = torch.flip(indices_4, [3])
+indices_5 = torch.flip(indices_5, [3])
 up5 = model.up5(down5, indices_5, unpool_shape5)
 up4 = model.up4(up5, indices_4, unpool_shape4)
 up3 = model.up3(up4, indices_3, unpool_shape3)
@@ -72,7 +77,7 @@ for i in range(num_test_samples):
     out_ = np.clip(out_, 0, 255)
     out_ = out_.astype(np.uint8)
     out_ = cv.cvtColor(out_, cv.COLOR_RGB2BGR)
-    cv.imwrite(f'images/{i}_adv_out.png', out_)
+    cv.imwrite(f'images/{i}_flip_out.png', out_)
 
 # if args.type == 'output':
 #     with torch.no_grad():

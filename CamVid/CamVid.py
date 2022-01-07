@@ -3,9 +3,10 @@ import time
 import torch.optim as optim
 from torch import nn
 from torch.utils.data import DataLoader
-
 from CamVid_Data import VaeDataset
+import torchvision.transforms as transforms
 from models import SegNet
+from FCN import FCN
 from CamVid_utils import *
 
 def train(epoch, train_loader, model, optimizer):
@@ -23,7 +24,7 @@ def train(epoch, train_loader, model, optimizer):
         y = y.to(device)
         optimizer.zero_grad()
 
-        y_hat = model(x)
+        y_hat = model(x)[0]
         loss = torch.sqrt((y_hat - y).pow(2).mean())
         loss.backward()
         optimizer.step()
@@ -34,7 +35,7 @@ def train(epoch, train_loader, model, optimizer):
         # Print status
         if i_batch % print_freq == 0:
             print('Epoch: [{0}][{1}/{2}]\t'
-                  'Batcåh Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                  'Batch Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                   'Loss {loss.val:.7f} ({loss.avg:.7f})\t'.format(epoch, i_batch, len(train_loader),
                                                                   batch_time=batch_time,
                                                                   loss=losses))
@@ -53,7 +54,7 @@ def valid(val_loader, model):
             # Set device options
             x = x.to(device)
             y = y.to(device)
-            y_hat = model(x)
+            y_hat = model(x)[0]
             loss = torch.sqrt((y_hat - y).pow(2).mean())
             # Keep track of metrics
             losses.update(loss.item())
@@ -71,12 +72,13 @@ def valid(val_loader, model):
 
 def main():
     train_loader = DataLoader(dataset=VaeDataset('./Dataset/train.txt'), batch_size=batch_size, shuffle=True,
-                              pin_memory=True, drop_last=True)
+                               pin_memory=True, drop_last=True)
     val_loader = DataLoader(dataset=VaeDataset('./Dataset/val.txt'), batch_size=batch_size, shuffle=False,
                             pin_memory=True, drop_last=True)
     # Create SegNet model
     label_nbr = 12
-    model = SegNet(label_nbr)
+    #model = SegNet(label_nbr)
+    model = FCN(n_class=label_nbr)
     if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")
         # dim = 0 [40, xxx] -> [10, ...], [10, ...], [10, ...], [10, ...] on 4 GPUs
